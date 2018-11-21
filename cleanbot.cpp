@@ -7,36 +7,64 @@
 #include <stdio.h>
 #include<stack>
 using namespace std;
+class graph;
+
 
 class postion{
     public:
         int x;
-        int y; 
+        int y;
+        int intersection_count; 
 };
 
 class cleanbot{
     public:
-        postion current_position;
-        void move_up();
-        void move_down();
-        void move_left();
-        void move_right();
-        void back_to_intersection();
-        void back_to_charge();
-        void clean();
+        void read_data_file(string input_path);
+        // void move_up();
+        // void move_down();
+        // void move_left();
+        // void move_right();
+        // void back_to_intersection();
+        void back_to_charge(int x, int y);
+        void clean(int x , int y);
         cleanbot():current_position.x(0),current_position.y(0){};
-        cleanbot(int x , int y):(current_position.x(x),current_position.y(y)){};
+        cleanbot(int x , int y):(start.x(x),start.y(y)){};
     private:
+        int row_size;
+        int col_size;
+        int B;
+        position start;
+        postion current_position;
+        vector<vector< bool > > matrix;
         stack<char> back_to_intersection;
-        stack<int> postion_of_intersection; 
+        stack< position > postion_of_intersection; 
+        friend class graph;
+};
+
+class graph{
+    matrix[]
 };
 
 
 int main(){
-    int row_size=0,col_size=0,B=0;
-    postion start;
-    vector<vector<bool> > matrix;
+    //int row_size=0,col_size=0,B=0;
+    //postion start;
+    //vector<vector<bool> > matrix;
     string input_path, output_path;
+    cleanbot robot(input_path);
+    robot.read_data_file(input_path);    
+        
+
+
+    
+    
+    
+
+
+    return 0;
+}
+
+void cleanbot::read_data_file(string input_path){
     ifstream matrixfile (input_path);
     if(!matrixfile.is_open())
         cout<<"failed to open the file"<<"\n";
@@ -59,21 +87,96 @@ int main(){
             for(int j=0;j<col_size;j++){
                 matrixfile>>matrix[i][j];
                 if(matrix[i][j]!=true || matrix[i][j]!=false){
-                    matrix[i][j]=false;
+                    matrix[i][j]=true;
                     start.x=i;
                     start.y=j;
                 }
             }
         }
-        matrixfile.close();            
-        postion current_postion;    
-        cleanbot robot(start.x , start.y);
-
-
+        matrixfile.close();
+        clean(start.x , start.y);
+        //cleanbot robot(start.x , start.y);
     }
-    
-    
+}
 
+void cleanbot::clean(int x , int y){
+    position intersection;
+    int step_to_teturn=0;
+    back_to_intersection.push(string "R");
+    while( !postion_of_intersection.empty() ){
+        if(matrix[x-1][y]==false){
+            matrix[x-1][y]=true;
+            //move up
+            x=x-1;
+            //每走一格電力少一
+            B--;
+            step_to_teturn++;
+            back_to_charge.push_back(string "down");
+            //定義該點是否為岔路
+            if(matrix[x-1][y]==false)
+                intersection.intersection_count++;
+            if(matrix[x][y+1]==false)
+                intersection.intersection_count++
+            if(matrix[x+1][y]==false)
+                intersection.intersection_count++
+            if(matrix[x][y-1]==false)
+                intersection.intersection_count++
+            if(intersection.intersection_count>=2){
+                intersection.x=x;
+                intersection.y=y;
+                postion_of_intersection.push(intersection);
+            }
 
-    return 0;
+            if(B<=step_to_teturn+1){
+                back_to_charge(x,y);
+                back_to_node();
+            }
+
+        }
+        else if(matrix[x][y+1]==false){
+            matrix[x][y+1]=true;
+            y=y+1;
+            B--;
+        }
+        else if(matrix[x+1][y]==false){
+            matrix[x+1][y]=true;
+            x=x+1;
+            B--;
+        }
+        else if(matrix[x][y-1]==false){
+            matrix[x][y-1]=true;
+            y=y-1;
+            B--;
+        }
+        else{
+            back_to_charge(x,y);
+            back_to_node();
+        }
+    }
+}
+
+void cleanbot::back_to_charge(int x, int y){
+    B=B+back_to_charge.size();
+    while(!back_to_charge.empty()){
+        if(back_to_charge.top()=="up"){
+            x=x-1;
+            back_to_charge.pop();
+        }
+        else if(back_to_charge.top()=="right"){
+            y=y+1;
+            back_to_charge.pop();
+        }
+        else if(back_to_charge.top()=="down"){
+            x=x+1;
+            back_to_charge.pop();                
+        }
+        else{
+            y=y-1;
+            back_to_charge.pop();
+        }
+    }
+}
+
+void cleanbot::back_to_intersection(){
+
 }
